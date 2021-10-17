@@ -50,12 +50,13 @@ extern uint8_t arcade[];
 bool antirrebote1, antirrebote2;    //variables para antirrebote
 bool b1 =1;   //variable booleanaa para J1
 bool b2 =1;   //variable booleana para J2
-int wenas;
+int n = 0;
+int nn;
 int y = 175;
 int x = 50;
 int w;
 int z;
-int E = 0;
+int E = 5;
 int l = 0;
 int h = 0;
 File myFile;
@@ -163,10 +164,35 @@ void loop() {
     LCD_Clear(0x00);
   }
     while(iniciado){
+      int H[3200];
+      int V[2400];
+      if (E==5){
+        for(x; x <320; x++){
+          delay(10);
+    
+          //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
+          //-------Función para dibujar una imagen a partir de un arreglo de colores (Bitmap) Formato (Color 16bit R 5bits G 6bits B 5bits)
+          //void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[])
+          LCD_Bitmap(x,y,32,24,tron);
+          V_line( x -1, y+12, 2, 0x421b  );
+          H[n] = x-1;
+          V[n] = y+12;
+          n++;
+          if(x+32>320){
+            while(true){
+                
+            }
+          }
+          if(digitalRead(PUSH1)==LOW || digitalRead(PA_7)==LOW || digitalRead(PA_6)==LOW || digitalRead(PUSH2)==LOW){
+            E=4;
+            break;
+          }
+        }
+      }
       w=x;
       z=y;
       if ((digitalRead(PUSH1)==HIGH || digitalRead(PA_7)==HIGH || digitalRead(PA_6)==HIGH) && digitalRead(PUSH2)==LOW){
-        for(x; x <320-32; x++){
+        for(x; x <320; x++){
           delay(10);
     
           //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
@@ -175,26 +201,43 @@ void loop() {
           LCD_Bitmap(x,y,32,24,tron);
           if (x-w>16){
             V_line( x -1, y+12, 2, 0x421b  );
+            H[n] = x-1;
+            V[n] = y+12;
+            n++;
             if (E==1){
               l=0;
               for(l; l<12; l++){
               H_line( w+16, z+l, 2, 0x421b);
+              H[n] = w+16;
+              V[n] = z+l;
+              n++;
               }
               E=0;
             }
             else if (E==2){
               l=0;
-              for(l; l<24; l++){
+              for(l; l<12; l++){
               H_line( w+16, z+l+12, 2, 0x421b);
+              H[n] = w+16;
+              V[n] = z+l+12;
+              n++;
               }
               E=0;
             }
+            nn=0;
+            for(nn; nn<n; nn++){
+              if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+                while(true){
+                  
+                }
+              }
           }
           if ((digitalRead(PUSH1)==LOW || digitalRead(PA_7)==LOW || digitalRead(PA_6)==LOW) && digitalRead(PUSH2)==HIGH){
             E=4;
             break;
           }
         } 
+      }
       }
       else if (digitalRead(PUSH1)==LOW && (digitalRead(PUSH2)==HIGH || digitalRead(PA_7)==HIGH || digitalRead(PA_6)==HIGH)){
         for(x; x <320-32; x--){
@@ -206,20 +249,37 @@ void loop() {
           LCD_Bitmap(x,y,32,24,tron);
           if (w-x>16){
             V_line( x +33, y+12, 2, 0x421b  );
+            H[n] = x+33;
+            V[n] = y+12;
+            n++;
             if (E==1){
               l=0;
               for(l; l<12; l++){
               H_line( w+16, z+l, 2, 0x421b);
+              H[n] = w+16;
+              V[n] = z+l;
+              n++;
               }
               E=0;
             }
             else if (E==2){
               l=0;
-              for(l; l<24; l++){
+              for(l; l<12; l++){
               H_line( w+16, z+l+12, 2, 0x421b);
+              H[n] = w+16;
+              V[n] = z+l+12;
+              n++;
               }
               E=0;
             }
+          }
+          nn=0;
+          for(nn; nn<n; nn++){
+              if (((H[nn]==(x))&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+                while(true){
+                  
+                }
+              }
           }
           if ((digitalRead(PUSH2)==LOW || digitalRead(PA_7)==LOW || digitalRead(PA_6)==LOW) && digitalRead(PUSH1)==HIGH){
             E=3;
@@ -228,7 +288,7 @@ void loop() {
         } 
       }
       else if ((digitalRead(PUSH2)==HIGH || digitalRead(PUSH1)==HIGH || digitalRead(PA_7)==HIGH) && digitalRead(PA_6)==LOW){
-        for(y; y <240-24; y++){
+        for(y; y <240; y++){
           delay(10);
     
           //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
@@ -237,10 +297,16 @@ void loop() {
           LCD_Bitmap(x,y,32,24,tron);
           if (y-z>12){
             H_line( x+16, y-1, 2, 0x421b  );
+            H[n] = x+16;
+            V[n] = y-1;
+            n++;
             if (E==3){
               h=0;
               for(h; h<17; h++){
               V_line( w+h+16, z+12, 2, 0x421b);
+              H[n] = w+h+16;
+              V[n] = z+12;
+              n++;
               }
               E=0;
             }
@@ -248,8 +314,19 @@ void loop() {
               h=0;
               for(h; h<16; h++){
               V_line( w+h, z+12, 2, 0x421b);
+              H[n] = w+h;
+              V[n] = z+12;
+              n++;
               }
               E=0;
+            }
+          }
+          nn = 0;
+          for(nn; nn<n; nn++){
+            if(((V[nn]<y+24)&&(V[nn]>y)&&(H[nn]>x)&&(H[nn]<x+32))||(y+24>240)){
+              while(true){
+                
+              }
             }
           }
           if ((digitalRead(PUSH2)==LOW || digitalRead(PA_7)==LOW || digitalRead(PUSH1)==LOW) && digitalRead(PA_6)==HIGH){
@@ -259,7 +336,7 @@ void loop() {
         } 
       }
       else if (digitalRead(PA_7)==LOW && (digitalRead(PUSH2)==HIGH || digitalRead(PUSH1)==HIGH || digitalRead(PA_6)==HIGH)){
-        for(y; y <240-24; y--){
+        for(y; y <240; y--){
           delay(10);
     
           //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
@@ -268,10 +345,16 @@ void loop() {
           LCD_Bitmap(x,y,32,24,tron);
           if (z-y>12){
             H_line( x+16, y+25, 2, 0x421b  );
+            H[n]=x+16;
+            V[n]=y+25;
+            n++;
             if (E==3){
               h=0;
               for(h; h<17; h++){
               V_line( w+h+16, z+12, 2, 0x421b);
+              H[n]=w+h+16;
+              V[n]=z+12;
+              n++;
               }
               E=0;
             }
@@ -279,8 +362,19 @@ void loop() {
               h=0;
               for(h; h<16; h++){
               V_line( w+h, z+12, 2, 0x421b);
+              H[n]=w+h;
+              V[n]=z+12;
+              n++;
               }
               E=0;
+            }
+          }
+          nn=0;
+          for(nn; nn<n; nn++){
+            if(((V[nn]>y)&&(V[nn]<y+24)&&(H[nn]>x)&&(H[nn]<x+32))||(y<0)){
+              while(true){
+                
+              }
             }
           }
           if ((digitalRead(PUSH2)==LOW || digitalRead(PUSH1)==LOW || digitalRead(PA_6)==LOW) && digitalRead(PA_7)==HIGH){
