@@ -1534,7 +1534,7 @@ void loop() {
             }
             else if (E==4){
               h=0;
-              for(h; h<16; h++){
+              for(h; h<17; h++){
               V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
@@ -1637,7 +1637,7 @@ void loop() {
             }
             else if (E==4){
               h=0;
-              for(h; h<16; h++){
+              for(h; h<17; h++){
               V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
@@ -1718,7 +1718,7 @@ void loop() {
               }
               else if (E==4){
                 h=0;
-                for(h; h<16; h++){
+                for(h; h<17; h++){
                 V_line( w+h, z+12, 2, 0x421b);
                 H[n] = w+h;
                 V[n] = z+12;
@@ -1740,7 +1740,7 @@ void loop() {
             }
             else if (E==4){
               h=0;
-              for(h; h<16; h++){
+              for(h; h<17; h++){
               V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
@@ -1821,7 +1821,7 @@ void loop() {
               }
               else if (E==4){
                 h=0;
-                for(h; h<16; h++){
+                for(h; h<17; h++){
                 V_line( w+h, z+12, 2, 0x421b);
                 H[n]=w+h;
                 V[n]=z+12;
@@ -1843,7 +1843,7 @@ void loop() {
             }
             else if (E==4){
               h=0;
-              for(h; h<16; h++){
+              for(h; h<17; h++){
               V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
