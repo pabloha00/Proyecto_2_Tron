@@ -197,7 +197,7 @@ void loop() {
           LCD_Bitmap(J2x,yy,32,24,tron2);
           if (x-w>16){
             V_line( x -1, y+12, 2, 0x421b  );
-            V_line( J2x+33, yy+12, 2, 0xfe  );
+            V_line( J2x+33, yy+12, 2, 0xfc00  );
             H[n] = x-1;
             V[n] = y+12;
             n++;
@@ -242,7 +242,7 @@ void loop() {
           LCD_Bitmap(J2x,yy,32,24,tron2);
           if (x-w<17){
             if (J1==1){
-              V_line(J2x+33,J2y+12,2,0xfe);
+              V_line(J2x+33,J2y+12,2,0xfc00);
               H[n] = J2x+33;
               V[n] = J2y+12;
               n++;
@@ -256,7 +256,7 @@ void loop() {
           }
           else if (x-w>16){
             V_line( x -1, y+12, 2, 0x421b  );
-            V_line( J2x+33, yy+12, 2, 0xfe  );
+            V_line( J2x+33, yy+12, 2, 0xfc00  );
             H[n] = x-1;
             V[n] = y+12;
             n++;
@@ -289,7 +289,7 @@ void loop() {
               if (E==1){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l, 2, 0xfe);
+                H_line( xx+16, yy+l, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l;
                 n++;
@@ -299,7 +299,7 @@ void loop() {
               else if (E==2){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H_line( xx+16, yy+l+12, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l+12;
                 n++;
@@ -345,7 +345,7 @@ void loop() {
           LCD_Bitmap(J2x,yy,32,24,tron2);
           if (w-x<17){
             if (J1==1){
-              V_line(J2x+33,yy+12,2,0xfe);
+              V_line(J2x+33,yy+12,2,0xfc00);
               H[n] = J2x+33;
               V[n] = yy+12;
               n++;
@@ -359,7 +359,7 @@ void loop() {
           }
           else if (w-x>16){
             V_line( x +33, y+12, 2, 0x421b  );
-            V_line(J2x+33, yy+12, 2, 0xfe);
+            V_line(J2x+33, yy+12, 2, 0xfc00);
             H[n] = x+33;
             V[n] = y+12;
             n++;
@@ -392,7 +392,7 @@ void loop() {
               if (E==1){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l, 2, 0xfe);
+                H_line( xx+16, yy+l, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l;
                 n++;
@@ -402,7 +402,7 @@ void loop() {
               else if (E==2){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H_line( xx+16, yy+l+12, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l+12;
                 n++;
@@ -448,7 +448,7 @@ void loop() {
           LCD_Bitmap(J2x,yy,32,24,tron2);
           if (y-z<13){
             if (J1==1){
-              V_line(J2x+33,yy+12,2,0xfe);
+              V_line(J2x+33,yy+12,2,0xfc00);
               H[n] = J2x+33;
               V[n] = yy+12;
               n++;
@@ -462,7 +462,7 @@ void loop() {
           }
           else if (y-z>12){
             H_line( x+16, y-1, 2, 0x421b  );
-            V_line(J2x+33, yy+12, 2, 0xfe);
+            V_line(J2x+33, yy+12, 2, 0xfc00);
             H[n] = x+16;
             V[n] = y-1;
             n++;
@@ -495,7 +495,7 @@ void loop() {
               if (E==1){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l, 2, 0xfe);
+                H_line( xx+16, yy+l, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l;
                 n++;
@@ -505,7 +505,7 @@ void loop() {
               else if (E==2){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H_line( xx+16, yy+l+12, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l+12;
                 n++;
@@ -551,7 +551,7 @@ void loop() {
           LCD_Bitmap(J2x,yy,32,24,tron2);
           if (z-y<13){
             if (J1==1){
-              V_line(J2x+33,yy+12,2,0xfe);
+              V_line(J2x+33,yy+12,2,0xfc00);
               H[n] = J2x+33;
               V[n] = yy+12;
               n++;
@@ -565,7 +565,7 @@ void loop() {
           }
           else if (z-y>12){
             H_line( x+16, y+25, 2, 0x421b  );
-            V_line(J2x+33,yy+12,2,0xfe);
+            V_line(J2x+33,yy+12,2,0xfc00);
             H[n]=x+16;
             V[n]=y+25;
             n++;
@@ -598,7 +598,7 @@ void loop() {
               if (E==1){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l, 2, 0xfe);
+                H_line( xx+16, yy+l, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l;
                 n++;
@@ -608,7 +608,7 @@ void loop() {
               else if (E==2){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H_line( xx+16, yy+l+12, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l+12;
                 n++;
@@ -654,7 +654,7 @@ void loop() {
           LCD_Bitmap(J2x,J2y,32,24,tron2);
           if (x-w<17){
             if (J1==1){
-              V_line(J2x-1,yy+12,2,0xfe);
+              V_line(J2x-1,yy+12,2,0xfc00);
               H[n] = J2x-1;
               V[n] = yy+12;
               n++;
@@ -671,7 +671,7 @@ void loop() {
             H[n] = x-1;
             V[n] = y+12;
             n++;
-            V_line( J2x -1, yy+12, 2, 0xfe  );
+            V_line( J2x -1, yy+12, 2, 0xfc00  );
             H[n] = J2x-1;
             V[n] = yy+12;
             n++;
@@ -701,7 +701,7 @@ void loop() {
               if (E==1){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l, 2, 0xfe);
+                H_line( xx+16, yy+l, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l;
                 n++;
@@ -711,7 +711,7 @@ void loop() {
               else if (E==2){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H_line( xx+16, yy+l+12, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l+12;
                 n++;
@@ -757,7 +757,7 @@ void loop() {
           LCD_Bitmap(J2x,J2y,32,24,tron2);
           if (w-x<17){
             if (J1==1){
-              V_line(J2x-1,yy+12,2,0xfe);
+              V_line(J2x-1,yy+12,2,0xfc00);
               H[n] = J2x-1;
               V[n] = yy+12;
               n++;
@@ -774,7 +774,7 @@ void loop() {
             H[n] = x+33;
             V[n] = y+12;
             n++;
-            V_line( J2x -1, yy+12, 2, 0xfe  );
+            V_line( J2x -1, yy+12, 2, 0xfc00  );
             H[n] = J2x-1;
             V[n] = yy+12;
             n++;
@@ -804,7 +804,7 @@ void loop() {
               if (E==1){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l, 2, 0xfe);
+                H_line( xx+16, yy+l, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l;
                 n++;
@@ -814,7 +814,7 @@ void loop() {
               else if (E==2){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H_line( xx+16, yy+l+12, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l+12;
                 n++;
@@ -860,7 +860,7 @@ void loop() {
           LCD_Bitmap(J2x,J2y,32,24,tron2);
           if (y-z<12){
             if (J1==1){
-              V_line(J2x-1,yy+12,2,0xfe);
+              V_line(J2x-1,yy+12,2,0xfc00);
               H[n] = J2x-1;
               V[n] = yy+12;
               n++;
@@ -877,7 +877,7 @@ void loop() {
             H[n] = x+16;
             V[n] = y-1;
             n++;
-            V_line( J2x -1, yy+12, 2, 0xfe  );
+            V_line( J2x -1, yy+12, 2, 0xfc00  );
             H[n] = J2x-1;
             V[n] = yy+12;
             n++;
@@ -907,7 +907,7 @@ void loop() {
               if (E==1){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l, 2, 0xfe);
+                H_line( xx+16, yy+l, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l;
                 n++;
@@ -917,7 +917,7 @@ void loop() {
               else if (E==2){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H_line( xx+16, yy+l+12, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l+12;
                 n++;
@@ -963,7 +963,7 @@ void loop() {
           LCD_Bitmap(J2x,J2y,32,24,tron2);
           if (z-y<13){
             if (J1==1){
-              V_line(J2x-1,yy+12,2,0xfe);
+              V_line(J2x-1,yy+12,2,0xfc00);
               H[n] = J2x-1;
               V[n] = yy+12;
               n++;
@@ -980,7 +980,7 @@ void loop() {
             H[n]=x+16;
             V[n]=y+25;
             n++;
-            V_line( J2x -1, yy+12, 2, 0xfe  );
+            V_line( J2x -1, yy+12, 2, 0xfc00  );
             H[n] = J2x-1;
             V[n] = yy+12;
             n++;
@@ -1010,7 +1010,7 @@ void loop() {
               if (E==1){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l, 2, 0xfe);
+                H_line( xx+16, yy+l, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l;
                 n++;
@@ -1020,7 +1020,7 @@ void loop() {
               else if (E==2){
                 l=0;
                 for(l; l<12; l++){
-                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H_line( xx+16, yy+l+12, 2, 0xfc00);
                 H[n] = xx+16;
                 V[n] = yy+l+12;
                 n++;
@@ -1066,7 +1066,7 @@ void loop() {
           LCD_Bitmap(J2x,J2y,32,24,tron2);
           if (x-w<17){
             if (J1==1){
-              H_line(J2x+16,J2y-1,2,0xfe);
+              H_line(J2x+16,J2y-1,2,0xfc00);
               H[n] = J2x+16;
               V[n] = J2y-1;
               n++;
@@ -1083,7 +1083,7 @@ void loop() {
             H[n] = x-1;
             V[n] = y+12;
             n++;
-            H_line( J2x+16, J2y-1, 2, 0xfe  );
+            H_line( J2x+16, J2y-1, 2, 0xfc00  );
             H[n] = J2x+16;
             V[n] = J2y-1;
             n++;
@@ -1113,7 +1113,7 @@ void loop() {
               if (E==3){
               h=0;
               for(h; h<17; h++){
-              V_line( xx+h+16, yy+12, 2, 0xfe);
+              V_line( xx+h+16, yy+12, 2, 0xfc00);
               H[n] = xx+h+16;
               V[n] = yy+12;
               n++;
@@ -1123,7 +1123,7 @@ void loop() {
             else if (E==4){
               h=0;
               for(h; h<16; h++){
-              V_line( xx+h, yy+12, 2, 0xfe);
+              V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
               n++;
@@ -1169,7 +1169,7 @@ void loop() {
           LCD_Bitmap(J2x,J2y,32,24,tron2);
           if (w-x<17){
             if (J1==1){
-              H_line(J2x+16,J2y-1,2,0xfe);
+              H_line(J2x+16,J2y-1,2,0xfc00);
               H[n] = J2x+16;
               V[n] = J2y-1;
               n++;
@@ -1186,7 +1186,7 @@ void loop() {
             H[n] = x+33;
             V[n] = y+12;
             n++;
-            H_line( J2x+16, J2y-1, 2, 0xfe  );
+            H_line( J2x+16, J2y-1, 2, 0xfc00  );
             H[n] = J2x+16;
             V[n] = J2y-1;
             n++;
@@ -1216,7 +1216,7 @@ void loop() {
               if (E==3){
               h=0;
               for(h; h<17; h++){
-              V_line( xx+h+16, yy+12, 2, 0xfe);
+              V_line( xx+h+16, yy+12, 2, 0xfc00);
               H[n] = xx+h+16;
               V[n] = yy+12;
               n++;
@@ -1226,7 +1226,7 @@ void loop() {
             else if (E==4){
               h=0;
               for(h; h<16; h++){
-              V_line( xx+h, yy+12, 2, 0xfe);
+              V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
               n++;
@@ -1272,7 +1272,7 @@ void loop() {
           LCD_Bitmap(J2x,J2y,32,24,tron2);
           if (y-z<13){
             if (J1==1){
-              H_line(J2x+16,J2y-1,2,0xfe);
+              H_line(J2x+16,J2y-1,2,0xfc00);
               H[n] = J2x+16;
               V[n] = J2y-1;
               n++;
@@ -1289,7 +1289,7 @@ void loop() {
             H[n] = x+16;
             V[n] = y-1;
             n++;
-            H_line( J2x+16, J2y-1, 2, 0xfe  );
+            H_line( J2x+16, J2y-1, 2, 0xfc00  );
             H[n] = J2x+16;
             V[n] = J2y-1;
             n++;
@@ -1319,7 +1319,7 @@ void loop() {
               if (E==3){
               h=0;
               for(h; h<17; h++){
-              V_line( xx+h+16, yy+12, 2, 0xfe);
+              V_line( xx+h+16, yy+12, 2, 0xfc00);
               H[n] = xx+h+16;
               V[n] = yy+12;
               n++;
@@ -1329,7 +1329,7 @@ void loop() {
             else if (E==4){
               h=0;
               for(h; h<16; h++){
-              V_line( xx+h, yy+12, 2, 0xfe);
+              V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
               n++;
@@ -1375,7 +1375,7 @@ void loop() {
           LCD_Bitmap(J2x,J2y,32,24,tron2);
           if (z-y<13){
             if (J1==1){
-              H_line(J2x+16,J2y-1,2,0xfe);
+              H_line(J2x+16,J2y-1,2,0xfc00);
               H[n] = J2x+16;
               V[n] = J2y-1;
               n++;
@@ -1392,7 +1392,7 @@ void loop() {
             H[n]=x+16;
             V[n]=y+25;
             n++;
-            H_line( J2x+16, J2y-1, 2, 0xfe  );
+            H_line( J2x+16, J2y-1, 2, 0xfc00  );
             H[n] = J2x+16;
             V[n] = J2y-1;
             n++;
@@ -1422,7 +1422,7 @@ void loop() {
               if (E==3){
               h=0;
               for(h; h<17; h++){
-              V_line( xx+h+16, yy+12, 2, 0xfe);
+              V_line( xx+h+16, yy+12, 2, 0xfc00);
               H[n] = xx+h+16;
               V[n] = yy+12;
               n++;
@@ -1432,7 +1432,7 @@ void loop() {
             else if (E==4){
               h=0;
               for(h; h<16; h++){
-              V_line( xx+h, yy+12, 2, 0xfe);
+              V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
               n++;
@@ -1478,7 +1478,7 @@ void loop() {
           LCD_Bitmap(J2x, J2y, 32,24,tron2);
           if (x-w<17){
             if (J1==1){
-              H_line( J2x+16, J2y+25, 2, 0xfe  );
+              H_line( J2x+16, J2y+25, 2, 0xfc00  );
               H[n]=J2x+16;
               V[n]=J2y+25;
               n++;
@@ -1495,7 +1495,7 @@ void loop() {
             H[n] = x-1;
             V[n] = y+12;
             n++;
-            H_line( J2x+16, J2y+25, 2, 0xfe  );
+            H_line( J2x+16, J2y+25, 2, 0xfc00  );
             H[n]=J2x+16;
             V[n]=J2y+25;
             n++;
@@ -1525,7 +1525,7 @@ void loop() {
               if (E==3){
               h=0;
               for(h; h<17; h++){
-              V_line( xx+h+16, yy+12, 2, 0xfe);
+              V_line( xx+h+16, yy+12, 2, 0xfc00);
               H[n] = xx+h+16;
               V[n] = yy+12;
               n++;
@@ -1535,7 +1535,7 @@ void loop() {
             else if (E==4){
               h=0;
               for(h; h<16; h++){
-              V_line( xx+h, yy+12, 2, 0xfe);
+              V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
               n++;
@@ -1581,7 +1581,7 @@ void loop() {
           LCD_Bitmap(J2x, J2y, 32,24,tron2);
           if (w-x<17){
             if (J1==1){
-              H_line( J2x+16, J2y+25, 2, 0xfe  );
+              H_line( J2x+16, J2y+25, 2, 0xfc00  );
               H[n]=J2x+16;
               V[n]=J2y+25;
               n++;
@@ -1598,7 +1598,7 @@ void loop() {
             H[n] = x+33;
             V[n] = y+12;
             n++;
-            H_line( J2x+16, J2y+25, 2, 0xfe  );
+            H_line( J2x+16, J2y+25, 2, 0xfc00  );
             H[n]=J2x+16;
             V[n]=J2y+25;
             n++;
@@ -1628,7 +1628,7 @@ void loop() {
               if (E==3){
               h=0;
               for(h; h<17; h++){
-              V_line( xx+h+16, yy+12, 2, 0xfe);
+              V_line( xx+h+16, yy+12, 2, 0xfc00);
               H[n] = xx+h+16;
               V[n] = yy+12;
               n++;
@@ -1638,7 +1638,7 @@ void loop() {
             else if (E==4){
               h=0;
               for(h; h<16; h++){
-              V_line( xx+h, yy+12, 2, 0xfe);
+              V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
               n++;
@@ -1684,7 +1684,7 @@ void loop() {
           LCD_Bitmap(J2x, J2y, 32,24,tron2);
           if (y-z<13){
             if (J1==1){
-              H_line( J2x+16, J2y+25, 2, 0xfe  );
+              H_line( J2x+16, J2y+25, 2, 0xfc00  );
               H[n]=J2x+16;
               V[n]=J2y+25;
               n++;
@@ -1701,7 +1701,7 @@ void loop() {
             H[n] = x+16;
             V[n] = y-1;
             n++;
-            H_line( J2x+16, J2y+25, 2, 0xfe  );
+            H_line( J2x+16, J2y+25, 2, 0xfc00  );
             H[n]=J2x+16;
             V[n]=J2y+25;
             n++;
@@ -1731,7 +1731,7 @@ void loop() {
               if (E==3){
               h=0;
               for(h; h<17; h++){
-              V_line( xx+h+16, yy+12, 2, 0xfe);
+              V_line( xx+h+16, yy+12, 2, 0xfc00);
               H[n] = xx+h+16;
               V[n] = yy+12;
               n++;
@@ -1741,7 +1741,7 @@ void loop() {
             else if (E==4){
               h=0;
               for(h; h<16; h++){
-              V_line( xx+h, yy+12, 2, 0xfe);
+              V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
               n++;
@@ -1787,7 +1787,7 @@ void loop() {
           LCD_Bitmap(J2x, J2y, 32,24,tron2);
           if (z-y<13){
             if (J1==1){
-              H_line( J2x+16, J2y+25, 2, 0xfe  );
+              H_line( J2x+16, J2y+25, 2, 0xfc00  );
               H[n]=J2x+16;
               V[n]=J2y+25;
               n++;
@@ -1804,7 +1804,7 @@ void loop() {
             H[n]=x+16;
             V[n]=y+25;
             n++;
-            H_line( J2x+16, J2y+25, 2, 0xfe  );
+            H_line( J2x+16, J2y+25, 2, 0xfc00  );
             H[n]=J2x+16;
             V[n]=J2y+25;
             n++;
@@ -1834,7 +1834,7 @@ void loop() {
               if (E==3){
               h=0;
               for(h; h<17; h++){
-              V_line( xx+h+16, yy+12, 2, 0xfe);
+              V_line( xx+h+16, yy+12, 2, 0xfc00);
               H[n] = xx+h+16;
               V[n] = yy+12;
               n++;
@@ -1844,7 +1844,7 @@ void loop() {
             else if (E==4){
               h=0;
               for(h; h<16; h++){
-              V_line( xx+h, yy+12, 2, 0xfe);
+              V_line( xx+h, yy+12, 2, 0xfc00);
               H[n] = xx+h;
               V[n] = yy+12;
               n++;
