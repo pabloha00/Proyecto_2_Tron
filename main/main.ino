@@ -30,6 +30,7 @@
 #include "bitmaps.h"
 #include "font.h"
 #include "lcd_registers.h"
+//#include "pitches.h"
 #include <SPI.h>
 #include <SD.h>
 
@@ -44,7 +45,8 @@
 #define LCD_RD PE_1
 //-------VARIABLES DE PROGRAMA
 int DPINS[] = {PB_0, PB_1, PB_2, PB_3, PB_4, PB_5, PB_6, PB_7};
-
+/*int melody[]={NOTE_G2, NOTE_C2, NOTE_A2, NOTE_G2, NOTE_G2, 0, NOTE_C2, NOTE_E3}; //notas de la cancioncita
+int noteDurations[]={4, 8, 7, 5, 4, 3, 4, 4}; */  
 extern uint8_t fondo[];
 extern uint8_t arcade[];
 bool antirrebote1, antirrebote2;    //variables para antirrebote
@@ -54,11 +56,19 @@ int n = 0;
 int nn;
 int y = 175;
 int x = 50;
-int w;
-int z;
+int xx = 270;
+int yy = 240-175;
+int w=x;
+int z=y;
+int J1=0;
+int J2x=270;
+int J2y=240-175;
 int E = 5;
 int l = 0;
 int h = 0;
+unsigned int m1=2;
+unsigned int m2=1;
+int serial;
 File myFile;
 bool iniciado=0;
 int buttonState = 0;         // current state of the button
@@ -85,7 +95,8 @@ int ascii2hex(int a);                       //funcion de mapeo de texto para ima
 void mapeo_SD(char doc[]);                  //despliegue de imagen mapeada
 //--
 void inicio(void);
-
+//void musica(void);
+void defensiva(void);
 /*-----------------------------------------------------------------------------
  --------------------- I N T E R R U P C I O N E S ----------------------------
  -----------------------------------------------------------------------------*/
@@ -97,15 +108,20 @@ void inicio(void);
  void setup() {
   //-------ENTRADAS Y SALIDA
   pinMode(31, INPUT_PULLUP);    //boton para imagen 1
-  pinMode(17, INPUT_PULLUP);    //boton para imagen 2
+  /*pinMode(17, INPUT_PULLUP);    //boton para imagen 2
   pinMode(9, INPUT_PULLUP);    //boton para imagen 1
-  pinMode(10, INPUT_PULLUP);    //boton para imagen 2
+  pinMode(10, INPUT_PULLUP);    //boton para imagen 2*/
   pinMode(PA_3, OUTPUT);    //se define salida del CS para comunicacion con SD
+  /*pinMode(PE_2, INPUT_PULLUP);
+  pinMode(PE_3, INPUT_PULLUP);
+  pinMode(PF_1, INPUT_PULLUP);
+  pinMode(PE_5, INPUT_PULLUP);*/
   //-------INICIALIZACION DE PROTOCOLOS DE COMUNICACION
   SPI.setModule(0);         //SPI para SD
   
   SysCtlClockSet(SYSCTL_SYSDIV_2_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);
   Serial.begin(9600);       //UART para menu
+  Serial3.begin(9600);
   GPIOPadConfigSet(GPIO_PORTB_BASE, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
   //-------INICIALIZACION DE TFT
   LCD_Init();
@@ -163,67 +179,136 @@ void loop() {
     //LCD_Bitmap(0, 0, 320, 240, arcade);                       //se despliega el fondo del arcade donde se jugara  
     LCD_Clear(0x00);
   }
+  //musica();
     while(iniciado){
       int H[3200];
       int V[2400];
-      if (E==5){
-        for(x; x <320; x++){
-          delay(10);
-    
-          //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
-          //-------Función para dibujar una imagen a partir de un arreglo de colores (Bitmap) Formato (Color 16bit R 5bits G 6bits B 5bits)
-          //void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[])
-          LCD_Bitmap(x,y,32,24,tron);
-          V_line( x -1, y+12, 2, 0x421b  );
-          H[n] = x-1;
-          V[n] = y+12;
-          n++;
-          if(x+32>320){
-            while(true){
-                
-            }
-          }
-          if(digitalRead(PUSH1)==LOW || digitalRead(PA_7)==LOW || digitalRead(PA_6)==LOW || digitalRead(PUSH2)==LOW){
-            E=4;
-            break;
-          }
-        }
-      }
       w=x;
       z=y;
-      if ((digitalRead(PUSH1)==HIGH || digitalRead(PA_7)==HIGH || digitalRead(PA_6)==HIGH) && digitalRead(PUSH2)==LOW){
+      xx=J2x;
+      yy=J2y;
+      defensiva();
+      if (E==5){
+        Serial3.write(1);
         for(x; x <320; x++){
           delay(10);
-    
-          //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
-          //-------Función para dibujar una imagen a partir de un arreglo de colores (Bitmap) Formato (Color 16bit R 5bits G 6bits B 5bits)
-          //void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[])
           LCD_Bitmap(x,y,32,24,tron);
+          J2x=J2x-1;
+          LCD_Bitmap(J2x,yy,32,24,tron2);
           if (x-w>16){
             V_line( x -1, y+12, 2, 0x421b  );
+            V_line( J2x+33, yy+12, 2, 0xfe  );
             H[n] = x-1;
             V[n] = y+12;
             n++;
-            if (E==1){
-              l=0;
-              for(l; l<12; l++){
-              H_line( w+16, z+l, 2, 0x421b);
-              H[n] = w+16;
-              V[n] = z+l;
-              n++;
+            H[n] = J2x+33;
+            V[n] = yy+12;
+            n++;
+            E=0;
+            nn=0;
+          }
+            for(nn; nn<n; nn++){
+              if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+                while(true){
+                  
+                }
               }
-              E=0;
-            }
-            else if (E==2){
-              l=0;
-              for(l; l<12; l++){
-              H_line( w+16, z+l+12, 2, 0x421b);
-              H[n] = w+16;
-              V[n] = z+l+12;
-              n++;
+              else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+              while(true){
+                
               }
-              E=0;
             }
+          }
+          defensiva();
+          if (m1!=2){
+            E=4;
+            J1=1;
+            break;
+          }
+          else if (m2!=1){
+            E=3;
+            J1=2;
+            break;
+          }
+        } 
+      }
+      
+  
+      else if ((m1==2)&&(m2==1)){
+        for(x; x <320; x++){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2x=J2x-1;
+          LCD_Bitmap(J2x,yy,32,24,tron2);
+          if (x-w<17){
+            if (J1==1){
+              V_line(J2x+33,J2y+12,2,0xfe);
+              H[n] = J2x+33;
+              V[n] = J2y+12;
+              n++;
+            }
+            else if (J1==2){
+              V_line(x-1,y+12,2,0x421b);
+              H[n] = x-1;
+              V[n] = y+12;
+              n++;
+            }
+          }
+          else if (x-w>16){
+            V_line( x -1, y+12, 2, 0x421b  );
+            V_line( J2x+33, yy+12, 2, 0xfe  );
+            H[n] = x-1;
+            V[n] = y+12;
+            n++;
+            H[n] = J2x+33;
+            V[n] = yy+12;
+            n++;
+            if (J1==1){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l+12, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            J1=0;
+          }
             nn=0;
             for(nn; nn<n; nn++){
               if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
@@ -231,95 +316,204 @@ void loop() {
                   
                 }
               }
+              else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+              while(true){
+                
+              }
+            }
           }
-          if ((digitalRead(PUSH1)==LOW || digitalRead(PA_7)==LOW || digitalRead(PA_6)==LOW) && digitalRead(PUSH2)==HIGH){
+          defensiva();
+          if (m1!=2){
             E=4;
+            J1=1;
+            break;
+          }
+          else if (m2!=1){
+            E=3;
+            J1=2;
             break;
           }
         } 
       }
-      }
-      else if (digitalRead(PUSH1)==LOW && (digitalRead(PUSH2)==HIGH || digitalRead(PA_7)==HIGH || digitalRead(PA_6)==HIGH)){
+      
+      
+      else if ((m1==1)&&(m2==1)){
         for(x; x <320-32; x--){
           delay(10);
-    
-          //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
-          //-------Función para dibujar una imagen a partir de un arreglo de colores (Bitmap) Formato (Color 16bit R 5bits G 6bits B 5bits)
-          //void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[])
           LCD_Bitmap(x,y,32,24,tron);
-          if (w-x>16){
+          J2x=J2x-1;
+          LCD_Bitmap(J2x,yy,32,24,tron2);
+          if (w-x<17){
+            if (J1==1){
+              V_line(J2x+33,yy+12,2,0xfe);
+              H[n] = J2x+33;
+              V[n] = yy+12;
+              n++;
+            }
+            else if (J1==2){
+              V_line(x+33,y+12,2,0x421b);
+              H[n] = x+33;
+              V[n] = y+12;
+              n++;
+            }
+          }
+          else if (w-x>16){
             V_line( x +33, y+12, 2, 0x421b  );
+            V_line(J2x+33, yy+12, 2, 0xfe);
             H[n] = x+33;
             V[n] = y+12;
             n++;
-            if (E==1){
-              l=0;
-              for(l; l<12; l++){
-              H_line( w+16, z+l, 2, 0x421b);
-              H[n] = w+16;
-              V[n] = z+l;
-              n++;
+            H[n] = J2x+33;
+            V[n] = yy+12;
+            n++;
+            if (J1==1){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l;
+                n++;
+                }
+                E=0;
               }
-              E=0;
-            }
-            else if (E==2){
-              l=0;
-              for(l; l<12; l++){
-              H_line( w+16, z+l+12, 2, 0x421b);
-              H[n] = w+16;
-              V[n] = z+l+12;
-              n++;
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l+12, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l+12;
+                n++;
+                }
+                E=0;
               }
-              E=0;
             }
+            else if (J1==2){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            J1=0;
           }
           nn=0;
           for(nn; nn<n; nn++){
               if (((H[nn]==(x))&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
                 while(true){
-                  
+                  Serial3.write(49);
                 }
               }
+              else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+              while(true){
+                
+              }
+            }
           }
-          if ((digitalRead(PUSH2)==LOW || digitalRead(PA_7)==LOW || digitalRead(PA_6)==LOW) && digitalRead(PUSH1)==HIGH){
+          defensiva();
+          if (m1!=1){
             E=3;
+            J1=1;
+            break;
+          }
+          else if (m2!=1){
+            E=3;
+            J1=2;
             break;
           }
         } 
       }
-      else if ((digitalRead(PUSH2)==HIGH || digitalRead(PUSH1)==HIGH || digitalRead(PA_7)==HIGH) && digitalRead(PA_6)==LOW){
+      
+      
+      else if ((m1==4)&&(m2==1)){
         for(y; y <240; y++){
           delay(10);
-    
-          //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
-          //-------Función para dibujar una imagen a partir de un arreglo de colores (Bitmap) Formato (Color 16bit R 5bits G 6bits B 5bits)
-          //void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[])
           LCD_Bitmap(x,y,32,24,tron);
-          if (y-z>12){
+          J2x=J2x-1;
+          LCD_Bitmap(J2x,yy,32,24,tron2);
+          if (y-z<13){
+            if (J1==1){
+              V_line(J2x+33,yy+12,2,0xfe);
+              H[n] = J2x+33;
+              V[n] = yy+12;
+              n++;
+            }
+            else if (J1==2){
+              H_line(x+16,y-1,2,0x421b);
+              H[n] = x+16;
+              V[n] = y-1;
+              n++;
+            }
+          }
+          else if (y-z>12){
             H_line( x+16, y-1, 2, 0x421b  );
+            V_line(J2x+33, yy+12, 2, 0xfe);
             H[n] = x+16;
             V[n] = y-1;
             n++;
-            if (E==3){
-              h=0;
-              for(h; h<17; h++){
-              V_line( w+h+16, z+12, 2, 0x421b);
-              H[n] = w+h+16;
-              V[n] = z+12;
-              n++;
+            H[n] = J2x+33;
+            V[n] = yy+12;
+            n++;
+            if (J1==1){
+              if (E==3){
+                h=0;
+                for(h; h<17; h++){
+                V_line( w+h+16, z+12, 2, 0x421b);
+                H[n] = w+h+16;
+                V[n] = z+12;
+                n++;
+                }
+                E=0;
               }
-              E=0;
-            }
-            else if (E==4){
-              h=0;
-              for(h; h<16; h++){
-              V_line( w+h, z+12, 2, 0x421b);
-              H[n] = w+h;
-              V[n] = z+12;
-              n++;
+              else if (E==4){
+                h=0;
+                for(h; h<16; h++){
+                V_line( w+h, z+12, 2, 0x421b);
+                H[n] = w+h;
+                V[n] = z+12;
+                n++;
+                }
+                E=0;
               }
-              E=0;
             }
+            else if (J1==2){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            J1=0;
           }
           nn = 0;
           for(nn; nn<n; nn++){
@@ -328,46 +522,101 @@ void loop() {
                 
               }
             }
+            else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+              while(true){
+                
+              }
+            }
           }
-          if ((digitalRead(PUSH2)==LOW || digitalRead(PA_7)==LOW || digitalRead(PUSH1)==LOW) && digitalRead(PA_6)==HIGH){
+          defensiva();
+          if (m1!=4){
             E=1;
+            J1=1;
+            break;
+          }
+          else if (m2!=1){
+            E=3;
+            J1=2;
             break;
           }
         } 
       }
-      else if (digitalRead(PA_7)==LOW && (digitalRead(PUSH2)==HIGH || digitalRead(PUSH1)==HIGH || digitalRead(PA_6)==HIGH)){
+
+      
+      else if ((m1==3)&&(m2==1)){
         for(y; y <240; y--){
           delay(10);
-    
-          //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
-          //-------Función para dibujar una imagen a partir de un arreglo de colores (Bitmap) Formato (Color 16bit R 5bits G 6bits B 5bits)
-          //void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[])
           LCD_Bitmap(x,y,32,24,tron);
-          if (z-y>12){
+          J2x=J2x-1;
+          LCD_Bitmap(J2x,yy,32,24,tron2);
+          if (z-y<13){
+            if (J1==1){
+              V_line(J2x+33,yy+12,2,0xfe);
+              H[n] = J2x+33;
+              V[n] = yy+12;
+              n++;
+            }
+            else if (J1==2){
+              H_line(x+16,y+25,2,0x421b);
+              H[n] = x+16;
+              V[n] = y+25;
+              n++;
+            }
+          }
+          else if (z-y>12){
             H_line( x+16, y+25, 2, 0x421b  );
+            V_line(J2x+33,yy+12,2,0xfe);
             H[n]=x+16;
             V[n]=y+25;
             n++;
-            if (E==3){
-              h=0;
-              for(h; h<17; h++){
-              V_line( w+h+16, z+12, 2, 0x421b);
-              H[n]=w+h+16;
-              V[n]=z+12;
-              n++;
+            H[n] = J2x+33;
+            V[n] = yy+12;
+            n++;
+            if (J1==1){
+              if (E==3){
+                h=0;
+                for(h; h<17; h++){
+                V_line( w+h+16, z+12, 2, 0x421b);
+                H[n]=w+h+16;
+                V[n]=z+12;
+                n++;
+                }
+                E=0;
               }
-              E=0;
-            }
-            else if (E==4){
-              h=0;
-              for(h; h<16; h++){
-              V_line( w+h, z+12, 2, 0x421b);
-              H[n]=w+h;
-              V[n]=z+12;
-              n++;
+              else if (E==4){
+                h=0;
+                for(h; h<16; h++){
+                V_line( w+h, z+12, 2, 0x421b);
+                H[n]=w+h;
+                V[n]=z+12;
+                n++;
+                }
+                E=0;
               }
-              E=0;
             }
+            else if (J1==2){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            J1=0;
           }
           nn=0;
           for(nn; nn<n; nn++){
@@ -376,9 +625,1257 @@ void loop() {
                 
               }
             }
+            else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+              while(true){
+                
+              }
+            }
           }
-          if ((digitalRead(PUSH2)==LOW || digitalRead(PUSH1)==LOW || digitalRead(PA_6)==LOW) && digitalRead(PA_7)==HIGH){
+          defensiva();
+          if (m1!=3){
             E=2;
+            J1=1;
+            break;
+          }
+          else if (m2!=1){
+            E=3;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      //---------------------------------------Jugador 2 hacia la derecha------------------------------------------
+      else if ((m1==2)&&(m2==2)){
+        for(x; x <320; x++){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2x=J2x+1;
+          LCD_Bitmap(J2x,J2y,32,24,tron2);
+          if (x-w<17){
+            if (J1==1){
+              V_line(J2x-1,yy+12,2,0xfe);
+              H[n] = J2x-1;
+              V[n] = yy+12;
+              n++;
+            }
+            else if (J1==2){
+              V_line(x-1,y+12,2,0x421b);
+              H[n] = x-1;
+              V[n] = y+12;
+              n++;
+            }
+          }
+          else if (x-w>16){
+            V_line( x -1, y+12, 2, 0x421b  );
+            H[n] = x-1;
+            V[n] = y+12;
+            n++;
+            V_line( J2x -1, yy+12, 2, 0xfe  );
+            H[n] = J2x-1;
+            V[n] = yy+12;
+            n++;
+            if (J1==1){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l+12, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            J1=0;
+          }
+            nn=0;
+            for(nn; nn<n; nn++){
+              if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+                while(true){
+                  
+                }
+              }
+              else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x>320-32)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=2){
+            E=4;
+            J1=1;
+            break;
+          }
+          else if (m2!=2){
+            E=4;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+
+      else if ((m1==1)&&(m2==2)){
+        for(x; x <320-32; x--){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2x=J2x+1;
+          LCD_Bitmap(J2x,J2y,32,24,tron2);
+          if (w-x<17){
+            if (J1==1){
+              V_line(J2x-1,yy+12,2,0xfe);
+              H[n] = J2x-1;
+              V[n] = yy+12;
+              n++;
+            }
+            else if (J1==2){
+              V_line(x+33,y+12,2,0x421b);
+              H[n] = x+33;
+              V[n] = y+12;
+              n++;
+            }
+          }
+          else if (w-x>16){
+            V_line( x +33, y+12, 2, 0x421b  );
+            H[n] = x+33;
+            V[n] = y+12;
+            n++;
+            V_line( J2x -1, yy+12, 2, 0xfe  );
+            H[n] = J2x-1;
+            V[n] = yy+12;
+            n++;
+            if (J1==1){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l+12, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l+12;
+                n++;
+                }
+              E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            J1=0;
+          }
+          nn=0;
+          for(nn; nn<n; nn++){
+              if (((H[nn]==(x))&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+                while(true){
+                  
+                }
+              }
+              else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x>320-32)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=1){
+            E=3;
+            J1=1;
+            break;
+          }
+          else if (m2!=2){
+            E=4;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      
+      else if ((m1==4)&&(m2==2)){
+        for(y; y <240; y++){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2x=J2x+1;
+          LCD_Bitmap(J2x,J2y,32,24,tron2);
+          if (y-z<12){
+            if (J1==1){
+              V_line(J2x-1,yy+12,2,0xfe);
+              H[n] = J2x-1;
+              V[n] = yy+12;
+              n++;
+            }
+            else if (J1==2){
+              H_line(x+16,y-1,2,0x421b);
+              H[n] = x+16;
+              V[n] = y-1;
+              n++;
+            }
+          }
+          else if (y-z>12){
+            H_line( x+16, y-1, 2, 0x421b  );
+            H[n] = x+16;
+            V[n] = y-1;
+            n++;
+            V_line( J2x -1, yy+12, 2, 0xfe  );
+            H[n] = J2x-1;
+            V[n] = yy+12;
+            n++;
+            if (J1==1){
+              if (E==3){
+                h=0;
+                for(h; h<17; h++){
+                V_line( w+h+16, z+12, 2, 0x421b);
+                H[n] = w+h+16;
+                V[n] = z+12;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==4){
+                h=0;
+                for(h; h<16; h++){
+                V_line( w+h, z+12, 2, 0x421b);
+                H[n] = w+h;
+                V[n] = z+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            J1=0;
+          }
+          nn = 0;
+          for(nn; nn<n; nn++){
+            if(((V[nn]<y+24)&&(V[nn]>y)&&(H[nn]>x)&&(H[nn]<x+32))||(y+24>240)){
+              while(true){
+                
+              }
+            }
+            else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x>320-32)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=4){
+            E=1;
+            J1=1;
+            break;
+          }
+          else if (m2!=2){
+            E=4;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      
+      else if ((m1==3)&&(m2==2)){
+        for(y; y <240; y--){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2x=J2x+1;
+          LCD_Bitmap(J2x,J2y,32,24,tron2);
+          if (z-y<13){
+            if (J1==1){
+              V_line(J2x-1,yy+12,2,0xfe);
+              H[n] = J2x-1;
+              V[n] = yy+12;
+              n++;
+            }
+            else if (J1==2){
+              H_line(x+16,y+25,2,0x421b);
+              H[n] = x+16;
+              V[n] = y+25;
+              n++;
+            }
+          }
+          else if (z-y>12){
+            H_line( x+16, y+25, 2, 0x421b  );
+            H[n]=x+16;
+            V[n]=y+25;
+            n++;
+            V_line( J2x -1, yy+12, 2, 0xfe  );
+            H[n] = J2x-1;
+            V[n] = yy+12;
+            n++;
+            if (J1==1){
+              if (E==3){
+                h=0;
+                for(h; h<17; h++){
+                V_line( w+h+16, z+12, 2, 0x421b);
+                H[n]=w+h+16;
+                V[n]=z+12;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==4){
+                h=0;
+                for(h; h<16; h++){
+                V_line( w+h, z+12, 2, 0x421b);
+                H[n]=w+h;
+                V[n]=z+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( xx+16, yy+l+12, 2, 0xfe);
+                H[n] = xx+16;
+                V[n] = yy+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            J1=0;
+          }
+          nn=0;
+          for(nn; nn<n; nn++){
+            if(((V[nn]>y)&&(V[nn]<y+24)&&(H[nn]>x)&&(H[nn]<x+32))||(y<0)){
+              while(true){
+                
+              }
+            }
+            else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x>320-32)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=3){
+            E=2;
+            J1=1;
+            break;
+          }
+          else if (m2!=2){
+            E=4;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      //----------------------------------------------Jugador 2 para abajo-------------------------------------------------
+      else if ((m1==2)&&(m2==4)){
+        for(x; x <320; x++){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2y=J2y+1;
+          LCD_Bitmap(J2x,J2y,32,24,tron2);
+          if (x-w<17){
+            if (J1==1){
+              H_line(J2x+16,J2y-1,2,0xfe);
+              H[n] = J2x+16;
+              V[n] = J2y-1;
+              n++;
+            }
+            else if (J1==2){
+              V_line(x-1,y+12,2,0x421b);
+              H[n] = x-1;
+              V[n] = y+12;
+              n++;
+            }
+          }
+          else if (x-w>16){
+            V_line( x -1, y+12, 2, 0x421b  );
+            H[n] = x-1;
+            V[n] = y+12;
+            n++;
+            H_line( J2x+16, J2y-1, 2, 0xfe  );
+            H[n] = J2x+16;
+            V[n] = J2y-1;
+            n++;
+            if (J1==1){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l+12, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==3){
+              h=0;
+              for(h; h<17; h++){
+              V_line( xx+h+16, yy+12, 2, 0xfe);
+              H[n] = xx+h+16;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            else if (E==4){
+              h=0;
+              for(h; h<16; h++){
+              V_line( xx+h, yy+12, 2, 0xfe);
+              H[n] = xx+h;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            }
+            J1=0;
+          }
+            nn=0;
+            for(nn; nn<n; nn++){
+              if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+                while(true){
+                  
+                }
+              }
+              else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y>240)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=2){
+            E=4;
+            J1=1;
+            break;
+          }
+          else if (m2!=4){
+            E=1;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      
+      else if ((m1==1)&&(m2==4)){
+        for(x; x <320-32; x--){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2y=J2y+1;
+          LCD_Bitmap(J2x,J2y,32,24,tron2);
+          if (w-x<17){
+            if (J1==1){
+              H_line(J2x+16,J2y-1,2,0xfe);
+              H[n] = J2x+16;
+              V[n] = J2y-1;
+              n++;
+            }
+            else if (J1==2){
+              V_line(x+16,y-1,2,0x421b);
+              H[n] = x+16;
+              V[n] = y-1;
+              n++;
+            }
+          }
+          else if (w-x>16){
+            V_line( x +33, y+12, 2, 0x421b  );
+            H[n] = x+33;
+            V[n] = y+12;
+            n++;
+            H_line( J2x+16, J2y-1, 2, 0xfe  );
+            H[n] = J2x+16;
+            V[n] = J2y-1;
+            n++;
+            if (J1==1){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l+12, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l+12;
+                n++;
+                }
+                E=0;
+                }
+            }
+            else if (J1==2){
+              if (E==3){
+              h=0;
+              for(h; h<17; h++){
+              V_line( xx+h+16, yy+12, 2, 0xfe);
+              H[n] = xx+h+16;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            else if (E==4){
+              h=0;
+              for(h; h<16; h++){
+              V_line( xx+h, yy+12, 2, 0xfe);
+              H[n] = xx+h;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            }
+            J1=0;
+          }
+          nn=0;
+          for(nn; nn<n; nn++){
+              if (((H[nn]==(x))&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+                while(true){
+                  
+                }
+              }
+              else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y>240)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=1){
+            E=3;
+            J1=1;
+            break;
+          }
+          else if (m2!=4){
+            E=1;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      
+      else if ((m1==4)&&(m2==4)){
+        for(y; y <240; y++){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2y=J2y+1;
+          LCD_Bitmap(J2x,J2y,32,24,tron2);
+          if (y-z<13){
+            if (J1==1){
+              H_line(J2x+16,J2y-1,2,0xfe);
+              H[n] = J2x+16;
+              V[n] = J2y-1;
+              n++;
+            }
+            else if (J1==2){
+              H_line(x+16,y-1,2,0x421b);
+              H[n] = x+16;
+              V[n] = y-1;
+              n++;
+            }
+          }
+          else if (y-z>12){
+            H_line( x+16, y-1, 2, 0x421b  );
+            H[n] = x+16;
+            V[n] = y-1;
+            n++;
+            H_line( J2x+16, J2y-1, 2, 0xfe  );
+            H[n] = J2x+16;
+            V[n] = J2y-1;
+            n++;
+            if (J1==1){
+              if (E==3){
+                h=0;
+                for(h; h<17; h++){
+                V_line( w+h+16, z+12, 2, 0x421b);
+                H[n] = w+h+16;
+                V[n] = z+12;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==4){
+                h=0;
+                for(h; h<16; h++){
+                V_line( w+h, z+12, 2, 0x421b);
+                H[n] = w+h;
+                V[n] = z+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==3){
+              h=0;
+              for(h; h<17; h++){
+              V_line( xx+h+16, yy+12, 2, 0xfe);
+              H[n] = xx+h+16;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            else if (E==4){
+              h=0;
+              for(h; h<16; h++){
+              V_line( xx+h, yy+12, 2, 0xfe);
+              H[n] = xx+h;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            }
+            J1=0;
+          }
+          nn = 0;
+          for(nn; nn<n; nn++){
+            if(((V[nn]<y+24)&&(V[nn]>y)&&(H[nn]>x)&&(H[nn]<x+32))||(y+24>240)){
+              while(true){
+                
+              }
+            }
+            else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y>240)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=4){
+            E=1;
+            J1=1;
+            break;
+          }
+          else if (m2!=4){
+            E=1;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      
+      else if ((m1==3)&&(m2==4)){
+        for(y; y <240; y--){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2y=J2y+1;
+          LCD_Bitmap(J2x,J2y,32,24,tron2);
+          if (z-y<13){
+            if (J1==1){
+              H_line(J2x+16,J2y-1,2,0xfe);
+              H[n] = J2x+16;
+              V[n] = J2y-1;
+              n++;
+            }
+            else if (J1==2){
+              H_line(x+16,y+25,2,0x421b);
+              H[n] = x+16;
+              V[n] = y+25;
+              n++;
+            }
+          }
+          else if (z-y>12){
+            H_line( x+16, y+25, 2, 0x421b  );
+            H[n]=x+16;
+            V[n]=y+25;
+            n++;
+            H_line( J2x+16, J2y-1, 2, 0xfe  );
+            H[n] = J2x+16;
+            V[n] = J2y-1;
+            n++;
+            if (J1==1){
+              if (E==3){
+                h=0;
+                for(h; h<17; h++){
+                V_line( w+h+16, z+12, 2, 0x421b);
+                H[n]=w+h+16;
+                V[n]=z+12;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==4){
+                h=0;
+                for(h; h<16; h++){
+                V_line( w+h, z+12, 2, 0x421b);
+                H[n]=w+h;
+                V[n]=z+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==3){
+              h=0;
+              for(h; h<17; h++){
+              V_line( xx+h+16, yy+12, 2, 0xfe);
+              H[n] = xx+h+16;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            else if (E==4){
+              h=0;
+              for(h; h<16; h++){
+              V_line( xx+h, yy+12, 2, 0xfe);
+              H[n] = xx+h;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            }
+            J1=0;
+          }
+          nn=0;
+          for(nn; nn<n; nn++){
+            if(((V[nn]>y)&&(V[nn]<y+24)&&(H[nn]>x)&&(H[nn]<x+32))||(y<0)){
+              while(true){
+                
+              }
+            }
+            else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y>240-24)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=3){
+            E=2;
+            J1=1;
+            break;
+          }
+          else if (m2!=4){
+            E=1;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      //-----------------------------------------Cuando Jugador 2 va hacia arriba---------------------------------------
+      else if ((m1==2)&&(m2==3)){
+        for(x; x <320; x++){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2y=J2y-1;
+          LCD_Bitmap(J2x, J2y, 32,24,tron2);
+          if (x-w<17){
+            if (J1==1){
+              H_line( J2x+16, J2y+25, 2, 0xfe  );
+              H[n]=J2x+16;
+              V[n]=J2y+25;
+              n++;
+            }
+            else if (J1==2){
+              V_line( x-1, y+12, 2, 0x421b  );
+              H[n]=x-1;
+              V[n]=y+12;
+              n++;
+            }
+          }
+          else if (x-w>16){
+            V_line( x -1, y+12, 2, 0x421b  );
+            H[n] = x-1;
+            V[n] = y+12;
+            n++;
+            H_line( J2x+16, J2y+25, 2, 0xfe  );
+            H[n]=J2x+16;
+            V[n]=J2y+25;
+            n++;
+            if (J1==1){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l+12, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==3){
+              h=0;
+              for(h; h<17; h++){
+              V_line( xx+h+16, yy+12, 2, 0xfe);
+              H[n] = xx+h+16;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            else if (E==4){
+              h=0;
+              for(h; h<16; h++){
+              V_line( xx+h, yy+12, 2, 0xfe);
+              H[n] = xx+h;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            }
+            J1=0;
+          }
+            nn=0;
+            for(nn; nn<n; nn++){
+              if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+                while(true){
+                  
+                }
+              }
+              else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y<0)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=2){
+            E=4;
+            J1=1;
+            break;
+          }
+          else if (m2!=3){
+            E=2;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      
+      else if ((m1==1)&&(m2==3)){
+        for(x; x <320-32; x--){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2y=J2y-1;
+          LCD_Bitmap(J2x, J2y, 32,24,tron2);
+          if (w-x<17){
+            if (J1==1){
+              H_line( J2x+16, J2y+25, 2, 0xfe  );
+              H[n]=J2x+16;
+              V[n]=J2y+25;
+              n++;
+            }
+            else if (J1==2){
+              V_line( x+33, y+12, 2, 0x421b  );
+              H[n]=x+33;
+              V[n]=y+12;
+              n++;
+            }
+          }
+          else if (w-x>16){
+            V_line( x +33, y+12, 2, 0x421b  );
+            H[n] = x+33;
+            V[n] = y+12;
+            n++;
+            H_line( J2x+16, J2y+25, 2, 0xfe  );
+            H[n]=J2x+16;
+            V[n]=J2y+25;
+            n++;
+            if (J1==1){
+              if (E==1){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==2){
+                l=0;
+                for(l; l<12; l++){
+                H_line( w+16, z+l+12, 2, 0x421b);
+                H[n] = w+16;
+                V[n] = z+l+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==3){
+              h=0;
+              for(h; h<17; h++){
+              V_line( xx+h+16, yy+12, 2, 0xfe);
+              H[n] = xx+h+16;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            else if (E==4){
+              h=0;
+              for(h; h<16; h++){
+              V_line( xx+h, yy+12, 2, 0xfe);
+              H[n] = xx+h;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            }
+            J1=0;
+          }
+          nn=0;
+          for(nn; nn<n; nn++){
+              if (((H[nn]==(x))&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+                while(true){
+                  
+                }
+              }
+              else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y<0)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=1){
+            E=3;
+            J1=1;
+            break;
+          }
+          else if (m2!=3){
+            E=2;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      
+      else if ((m1==4)&&(m2==3)){
+        for(y; y <240; y++){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2y=J2y-1;
+          LCD_Bitmap(J2x, J2y, 32,24,tron2);
+          if (y-z<13){
+            if (J1==1){
+              H_line( J2x+16, J2y+25, 2, 0xfe  );
+              H[n]=J2x+16;
+              V[n]=J2y+25;
+              n++;
+            }
+            else if (J1==2){
+              H_line( x+16, y-1, 2, 0x421b  );
+              H[n]=x+16;
+              V[n]=y-1;
+              n++;
+            }
+          }
+          else if (y-z>12){
+            H_line( x+16, y-1, 2, 0x421b  );
+            H[n] = x+16;
+            V[n] = y-1;
+            n++;
+            H_line( J2x+16, J2y+25, 2, 0xfe  );
+            H[n]=J2x+16;
+            V[n]=J2y+25;
+            n++;
+            if (J1==1){
+              if (E==3){
+                h=0;
+                for(h; h<17; h++){
+                V_line( w+h+16, z+12, 2, 0x421b);
+                H[n] = w+h+16;
+                V[n] = z+12;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==4){
+                h=0;
+                for(h; h<16; h++){
+                V_line( w+h, z+12, 2, 0x421b);
+                H[n] = w+h;
+                V[n] = z+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==3){
+              h=0;
+              for(h; h<17; h++){
+              V_line( xx+h+16, yy+12, 2, 0xfe);
+              H[n] = xx+h+16;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            else if (E==4){
+              h=0;
+              for(h; h<16; h++){
+              V_line( xx+h, yy+12, 2, 0xfe);
+              H[n] = xx+h;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            }
+            J1=0;
+          }
+          nn = 0;
+          for(nn; nn<n; nn++){
+            if(((V[nn]<y+24)&&(V[nn]>y)&&(H[nn]>x)&&(H[nn]<x+32))||(y+24>240)){
+              while(true){
+                
+              }
+            }
+            else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y<0)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=4){
+            E=1;
+            J1=1;
+            break;
+          }
+          else if (m2!=3){
+            E=2;
+            J1=2;
+            break;
+          }
+        } 
+      }
+
+      
+      else if ((m1==3)&&(m2==3)){
+        for(y; y <240; y--){
+          delay(10);
+          LCD_Bitmap(x,y,32,24,tron);
+          J2y=J2y-1;
+          LCD_Bitmap(J2x, J2y, 32,24,tron2);
+          if (z-y<13){
+            if (J1==1){
+              H_line( J2x+16, J2y+25, 2, 0xfe  );
+              H[n]=J2x+16;
+              V[n]=J2y+25;
+              n++;
+            }
+            else if (J1==2){
+              H_line( x+16, y+25, 2, 0x421b  );
+              H[n]=x+16;
+              V[n]=y+25;
+              n++;
+            }
+          }
+          else if (z-y>12){
+            H_line( x+16, y+25, 2, 0x421b  );
+            H[n]=x+16;
+            V[n]=y+25;
+            n++;
+            H_line( J2x+16, J2y+25, 2, 0xfe  );
+            H[n]=J2x+16;
+            V[n]=J2y+25;
+            n++;
+            if (J1==1){
+              if (E==3){
+                h=0;
+                for(h; h<17; h++){
+                V_line( w+h+16, z+12, 2, 0x421b);
+                H[n]=w+h+16;
+                V[n]=z+12;
+                n++;
+                }
+                E=0;
+              }
+              else if (E==4){
+                h=0;
+                for(h; h<16; h++){
+                V_line( w+h, z+12, 2, 0x421b);
+                H[n]=w+h;
+                V[n]=z+12;
+                n++;
+                }
+                E=0;
+              }
+            }
+            else if (J1==2){
+              if (E==3){
+              h=0;
+              for(h; h<17; h++){
+              V_line( xx+h+16, yy+12, 2, 0xfe);
+              H[n] = xx+h+16;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            else if (E==4){
+              h=0;
+              for(h; h<16; h++){
+              V_line( xx+h, yy+12, 2, 0xfe);
+              H[n] = xx+h;
+              V[n] = yy+12;
+              n++;
+              }
+              E=0;
+            }
+            }
+            J1=0;
+          }
+          nn=0;
+          for(nn; nn<n; nn++){
+            if(((V[nn]>y)&&(V[nn]<y+24)&&(H[nn]>x)&&(H[nn]<x+32))||(y<0)){
+              while(true){
+                
+              }
+            }
+            else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y<0)){
+                while(true){
+                
+              }
+            }
+          }
+          defensiva();
+          if (m1!=3){
+            E=2;
+            J1=1;
+            break;
+          }
+          else if (m2!=3){
+            E=2;
+            J1=2;
             break;
           }
         } 
@@ -885,5 +2382,73 @@ void mapeo_SD(char doc[]) {
   else {
     Serial.println("No se pudo abrir la imagen, prueba nuevamente");
     myFile.close();
+  }
+}
+
+/*void musica(void){
+  for (int thisNote=0; thisNote <8; thisNote++){
+    int noteDuration = f00b0 / noteDurations [thisNote]; //se define la duracion aproximada de cada nota
+    tone(PF_2, melody [thisNote], noteDuration);
+    int pauseBetweenNotes = noteDuration * 1.30;        //se alarga ligeramente el tiempo de duracion
+    delay(pauseBetweenNotes);                           //se para por un tiempo
+    noTone(8);
+    delay(10);
+  }
+}
+
+void defensiva(void){
+  if ((digitalRead(PUSH1)==HIGH || digitalRead(PA_7)==HIGH || digitalRead(PA_6)==HIGH) && digitalRead(PUSH2)==LOW){
+    m1=2;
+  }
+  else if (digitalRead(PUSH1)==LOW && (digitalRead(PUSH2)==HIGH || digitalRead(PA_7)==HIGH || digitalRead(PA_6)==HIGH)){
+    m1=1;
+  }
+  else if (digitalRead(PA_7)==LOW && (digitalRead(PUSH2)==HIGH || digitalRead(PUSH1)==HIGH || digitalRead(PA_6)==HIGH)){
+    m1=3;
+  }
+  else if ((digitalRead(PUSH2)==HIGH || digitalRead(PUSH1)==HIGH || digitalRead(PA_7)==HIGH) && digitalRead(PA_6)==LOW){
+    m1=4;
+  }
+  if ((digitalRead(PE_2)==HIGH || digitalRead(PE_3)==HIGH || digitalRead(PF_1)==HIGH) && digitalRead(PE_5)==LOW){
+    m2=1;
+  }
+  else if ((digitalRead(PE_2)==HIGH || digitalRead(PE_3)==HIGH || digitalRead(PE_5)==HIGH) && digitalRead(PF_1)==LOW){
+    m2=2;
+  }
+  else if ((digitalRead(PE_5)==HIGH || digitalRead(PE_3)==HIGH || digitalRead(PF_1)==HIGH) && digitalRead(PE_2)==LOW){
+    m2=3;
+  }
+  else if ((digitalRead(PE_2)==HIGH || digitalRead(PE_5)==HIGH || digitalRead(PF_1)==HIGH) && digitalRead(PE_3)==LOW){
+    m2=4;
+  }
+}
+
+*/
+
+/*void defensiva(void){
+  if (Serial3.available()){
+    serial=Serial3.read();
+    if(52<serial<57){
+      m1 = serial-52;
+      Serial.println(m1);
+    }
+    if(48<serial<53){
+      m2 = serial-48;
+      Serial.println(m2);
+    }
+  }
+}*/
+void defensiva(void){
+  if (Serial3.available()){
+    char readData[3];
+    Serial3.readBytesUntil(13, readData, 3);
+    m1=readData[0];
+    m2=readData[1];
+    Serial.println(m1);
+    Serial.println(m2);
+    m1 = m1-52;
+    m2 = m2-48;
+    Serial.println(m1);
+    Serial.println(m2);
   }
 }
