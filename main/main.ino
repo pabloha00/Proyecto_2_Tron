@@ -33,7 +33,7 @@
 //#include "pitches.h"
 #include <SPI.h>
 #include <SD.h>
-
+#include "pitches.h"
 /*-----------------------------------------------------------------------------
  -----------------V A R I A B L E S   A   I M P L E M T E N T A R--------------
  -----------------------------------------------------------------------------*/
@@ -95,8 +95,9 @@ int ascii2hex(int a);                       //funcion de mapeo de texto para ima
 void mapeo_SD(char doc[]);                  //despliegue de imagen mapeada
 //--
 void inicio(void);
-//void musica(void);
 void defensiva(void);
+void beep(int note, int duration);
+void musica(void);
 /*-----------------------------------------------------------------------------
  --------------------- I N T E R R U P C I O N E S ----------------------------
  -----------------------------------------------------------------------------*/
@@ -108,14 +109,8 @@ void defensiva(void);
  void setup() {
   //-------ENTRADAS Y SALIDA
   pinMode(31, INPUT_PULLUP);    //boton para imagen 1
-  /*pinMode(17, INPUT_PULLUP);    //boton para imagen 2
-  pinMode(9, INPUT_PULLUP);    //boton para imagen 1
-  pinMode(10, INPUT_PULLUP);    //boton para imagen 2*/
   pinMode(PA_3, OUTPUT);    //se define salida del CS para comunicacion con SD
-  /*pinMode(PE_2, INPUT_PULLUP);
-  pinMode(PE_3, INPUT_PULLUP);
-  pinMode(PF_1, INPUT_PULLUP);
-  pinMode(PE_5, INPUT_PULLUP);*/
+  pinMode(PF_2,OUTPUT);
   //-------INICIALIZACION DE PROTOCOLOS DE COMUNICACION
   SPI.setModule(0);         //SPI para SD
   
@@ -146,6 +141,7 @@ void defensiva(void);
   String text1 = "Presiona un boton";                  //texto inicial a desplegar
   LCD_Print(text1, 10, 110, 2, 0x0000, 0xffff);
   delay(1000);
+  //musica();
 }
 /*-----------------------------------------------------------------------------
  -------------------------- M A I N   L O O P ---------------------------------
@@ -179,7 +175,10 @@ void loop() {
     //LCD_Bitmap(0, 0, 320, 240, arcade);                       //se despliega el fondo del arcade donde se jugara  
     LCD_Clear(0x00);
   }
-  //musica();
+  if(iniciado==0){
+    musica();
+  }
+  
     while(iniciado){
       int H[3200];
       int V[2400];
@@ -207,14 +206,23 @@ void loop() {
             E=0;
             nn=0;
           }
+          //gana naranja
             for(nn; nn<n; nn++){
-              if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+              if (((H[nn]>x)&&(H[nn]<x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
-                  
+                  String text1 = "Gana jugador naranja";
+                  LCD_Print(text1,10,110,2,0x0000,0xffff);
                 }
               }
+              //gana azul
               else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
+                String text2 = "Gana jugador azul";
+                LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -311,13 +319,19 @@ void loop() {
           }
             nn=0;
             for(nn; nn<n; nn++){
-              if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+              if (((H[nn]>x)&&(H[nn]<x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
-                  
-                }
+                  String text1 = "Gana jugador naranja";
+                  LCD_Print(text1,10,110,2,0x0000,0xffff);                }
               }
               else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+              delay(1000);
+                LCD_Clear(0x00);
               while(true){
+                String text2 = "Gana jugador azul";
+                LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -414,13 +428,21 @@ void loop() {
           }
           nn=0;
           for(nn; nn<n; nn++){
-              if (((H[nn]==(x))&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+              if (((H[nn]>x)&&(H[nn]<x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
-                  Serial3.write(49);
+                  String text1 = "Gana jugador naranja";
+                  LCD_Print(text1,10,110,2,0x0000,0xffff);
                 }
               }
               else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
+                String text2 = "Gana jugador azul";
+                LCD_Print(text2,10,110,2,0x0000,0xffff);
+
                 
               }
             }
@@ -496,9 +518,9 @@ void loop() {
                 l=0;
                 for(l; l<12; l++){
                 H_line( xx+16, yy+l, 2, 0xfc00);
-                H[n] = xx+16;
-                V[n] = yy+l;
-                n++;
+                //H[n] = xx+16;
+                //V[n] = yy+l;
+                //n++;
                 }
                 E=0;
               }
@@ -506,9 +528,9 @@ void loop() {
                 l=0;
                 for(l; l<12; l++){
                 H_line( xx+16, yy+l+12, 2, 0xfc00);
-                H[n] = xx+16;
-                V[n] = yy+l+12;
-                n++;
+                //H[n] = xx+16;
+                //V[n] = yy+l+12;
+                //n++;
                 }
                 E=0;
               }
@@ -518,13 +540,19 @@ void loop() {
           nn = 0;
           for(nn; nn<n; nn++){
             if(((V[nn]<y+24)&&(V[nn]>y)&&(H[nn]>x)&&(H[nn]<x+32))||(y+24>240)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
-                
+                  String text1 = "Gana jugador naranja";
+                  LCD_Print(text1,10,110,2,0x0000,0xffff); 
               }
             }
             else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
-                
+                String text2 = "Gana jugador azul";
+                LCD_Print(text2,10,110,2,0x0000,0xffff);
               }
             }
           }
@@ -551,9 +579,9 @@ void loop() {
           LCD_Bitmap(J2x,yy,32,24,tron2);
           if (z-y<13){
             if (J1==1){
-              V_line(J2x+33,yy+12,2,0xfc00);
+              V_line(J2x+33,J2y+12,2,0xfc00);
               H[n] = J2x+33;
-              V[n] = yy+12;
+              V[n] = J2y+12;
               n++;
             }
             else if (J1==2){
@@ -565,12 +593,12 @@ void loop() {
           }
           else if (z-y>12){
             H_line( x+16, y+25, 2, 0x421b  );
-            V_line(J2x+33,yy+12,2,0xfc00);
+            V_line(J2x+33,J2y+12,2,0xfc00);
             H[n]=x+16;
             V[n]=y+25;
             n++;
             H[n] = J2x+33;
-            V[n] = yy+12;
+            V[n] = J2y+12;
             n++;
             if (J1==1){
               if (E==3){
@@ -599,9 +627,9 @@ void loop() {
                 l=0;
                 for(l; l<12; l++){
                 H_line( xx+16, yy+l, 2, 0xfc00);
-                H[n] = xx+16;
-                V[n] = yy+l;
-                n++;
+                //H[n] = xx+16;
+                //V[n] = yy+l;
+                //n++;
                 }
                 E=0;
               }
@@ -609,9 +637,9 @@ void loop() {
                 l=0;
                 for(l; l<12; l++){
                 H_line( xx+16, yy+l+12, 2, 0xfc00);
-                H[n] = xx+16;
-                V[n] = yy+l+12;
-                n++;
+                //H[n] = xx+16;
+                //V[n] = yy+l+12;
+                //n++;
                 }
                 E=0;
               }
@@ -621,13 +649,19 @@ void loop() {
           nn=0;
           for(nn; nn<n; nn++){
             if(((V[nn]>y)&&(V[nn]<y+24)&&(H[nn]>x)&&(H[nn]<x+32))||(y<0)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
-                
+                String text1 = "Gana jugador naranja";
+                LCD_Print(text1,10,110,2,0x0000,0xffff);
               }
             }
-            else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+            else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x<0)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
-                
+                String text2 = "Gana jugador azul";
+                LCD_Print(text2,10,110,2,0x0000,0xffff);
               }
             }
           }
@@ -723,14 +757,20 @@ void loop() {
           }
             nn=0;
             for(nn; nn<n; nn++){
-              if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+              if (((H[nn]>x)&&(H[nn]<x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
-                  
+                  String text1 = "Gana jugador naranja";
+                  LCD_Print(text1,10,110,2,0x0000,0xffff);
                 }
               }
               else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x>320-32)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
-                
+                String text2 = "Gana jugador azul";
+                LCD_Print(text2,10,110,2,0x0000,0xffff);
               }
             }
           }
@@ -826,13 +866,21 @@ void loop() {
           }
           nn=0;
           for(nn; nn<n; nn++){
-              if (((H[nn]==(x))&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+              if (((H[nn]>x)&&(H[nn]<x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+                delay(1000);
+                LCD_Clear(0);
                 while(true){
+                  String text1 = "Gana jugador naranja";
+                  LCD_Print(text1,10,110,2,0x0000,0xffff);
                   
                 }
               }
               else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x>320-32)){
+                delay(1000);
+                LCD_Clear(0);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -908,9 +956,9 @@ void loop() {
                 l=0;
                 for(l; l<12; l++){
                 H_line( xx+16, yy+l, 2, 0xfc00);
-                H[n] = xx+16;
-                V[n] = yy+l;
-                n++;
+                //H[n] = xx+16;
+                //V[n] = yy+l;
+                //n++;
                 }
                 E=0;
               }
@@ -918,9 +966,9 @@ void loop() {
                 l=0;
                 for(l; l<12; l++){
                 H_line( xx+16, yy+l+12, 2, 0xfc00);
-                H[n] = xx+16;
-                V[n] = yy+l+12;
-                n++;
+                //H[n] = xx+16;
+                //V[n] = yy+l+12;
+                //n++;
                 }
                 E=0;
               }
@@ -930,12 +978,19 @@ void loop() {
           nn = 0;
           for(nn; nn<n; nn++){
             if(((V[nn]<y+24)&&(V[nn]>y)&&(H[nn]>x)&&(H[nn]<x+32))||(y+24>240)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
-                
+                String text1 = "Gana jugador naranja";
+                LCD_Print(text1,10,110,2,0x0000,0xffff);
               }
             }
             else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x>320-32)){
+              delay(1000);
+              LCD_Clear(0x00);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -1011,9 +1066,9 @@ void loop() {
                 l=0;
                 for(l; l<12; l++){
                 H_line( xx+16, yy+l, 2, 0xfc00);
-                H[n] = xx+16;
-                V[n] = yy+l;
-                n++;
+                //H[n] = xx+16;
+                //V[n] = yy+l;
+                //n++;
                 }
                 E=0;
               }
@@ -1021,9 +1076,9 @@ void loop() {
                 l=0;
                 for(l; l<12; l++){
                 H_line( xx+16, yy+l+12, 2, 0xfc00);
-                H[n] = xx+16;
-                V[n] = yy+l+12;
-                n++;
+                //H[n] = xx+16;
+                //V[n] = yy+l+12;
+                //n++;
                 }
                 E=0;
               }
@@ -1033,12 +1088,19 @@ void loop() {
           nn=0;
           for(nn; nn<n; nn++){
             if(((V[nn]>y)&&(V[nn]<y+24)&&(H[nn]>x)&&(H[nn]<x+32))||(y<0)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
-                
+                String text1 = "Gana jugador naranja";
+                LCD_Print(text1,10,110,2,0x0000,0xffff);
               }
             }
             else if (((V[nn]>yy)&&(V[nn]<yy+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2x>320-32)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -1135,13 +1197,20 @@ void loop() {
           }
             nn=0;
             for(nn; nn<n; nn++){
-              if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+              if (((H[nn]>x)&&(H[nn]<x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
-                  
+                  String text1 = "Gana jugador naranja";
+                  LCD_Print(text1,10,110,2,0x0000,0xffff);
                 }
               }
               else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y>240)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -1238,13 +1307,20 @@ void loop() {
           }
           nn=0;
           for(nn; nn<n; nn++){
-              if (((H[nn]==(x))&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+              if (((H[nn]>x)&&(H[nn]<x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
-                  
+                  String text1 = "Gana jugador naranja";
+                  LCD_Print(text1,10,110,2,0x0000,0xffff);     
                 }
               }
               else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y>240)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -1342,12 +1418,19 @@ void loop() {
           nn = 0;
           for(nn; nn<n; nn++){
             if(((V[nn]<y+24)&&(V[nn]>y)&&(H[nn]>x)&&(H[nn]<x+32))||(y+24>240)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
-                
+                String text1 = "Gana jugador naranja";
+                LCD_Print(text1,10,110,2,0x0000,0xffff);
               }
             }
             else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y>240)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -1445,12 +1528,21 @@ void loop() {
           nn=0;
           for(nn; nn<n; nn++){
             if(((V[nn]>y)&&(V[nn]<y+24)&&(H[nn]>x)&&(H[nn]<x+32))||(y<0)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
+                String text1 = "Gana jugador naranja";
+                LCD_Print(text1,10,110,2,0x0000,0xffff);
                 
               }
             }
             else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y>240-24)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
+
                 
               }
             }
@@ -1547,13 +1639,21 @@ void loop() {
           }
             nn=0;
             for(nn; nn<n; nn++){
-              if (((H[nn]==x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+              if (((H[nn]>x)&&(H[nn]<x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x+32>320)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text1 = "Gana jugador naranja";
+                  LCD_Print(text1,10,110,2,0x0000,0xffff);
                   
                 }
               }
               else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y<0)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -1650,13 +1750,21 @@ void loop() {
           }
           nn=0;
           for(nn; nn<n; nn++){
-              if (((H[nn]==(x))&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+              if (((H[nn]>x)&&(H[nn]<x+32)&&(V[nn]<y+24)&&(V[nn]>y))||(x<0)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text1 = "Gana jugador naranja";
+                  LCD_Print(text1,10,110,2,0x0000,0xffff);
                   
                 }
               }
               else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y<0)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -1754,12 +1862,20 @@ void loop() {
           nn = 0;
           for(nn; nn<n; nn++){
             if(((V[nn]<y+24)&&(V[nn]>y)&&(H[nn]>x)&&(H[nn]<x+32))||(y+24>240)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
+                String text1 = "Gana jugador naranja";
+                LCD_Print(text1,10,110,2,0x0000,0xffff);
                 
               }
             }
             else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y<0)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -1857,12 +1973,20 @@ void loop() {
           nn=0;
           for(nn; nn<n; nn++){
             if(((V[nn]>y)&&(V[nn]<y+24)&&(H[nn]>x)&&(H[nn]<x+32))||(y<0)){
+              delay(1000);
+              LCD_Clear(0x00);
               while(true){
+                String text1 = "Gana jugador naranja";
+                LCD_Print(text1,10,110,2,0x0000,0xffff);
                 
               }
             }
             else if (((V[nn]>J2y)&&(V[nn]<J2y+24)&&(H[nn]>J2x)&&(H[nn]<J2x+32))||(J2y<0)){
+                delay(1000);
+                LCD_Clear(0x00);
                 while(true){
+                  String text2 = "Gana jugador azul";
+                  LCD_Print(text2,10,110,2,0x0000,0xffff);
                 
               }
             }
@@ -1880,68 +2004,8 @@ void loop() {
           }
         } 
       }
-      /*else if (digitalRead(PUSH1)==LOW){
-        for(x; x <320-32; x=x+5){
-          Serial.println("CAMINA RÁPIDO");
-          delay(10);
-          int mario_index = (x/11)%8;
-    
-          //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
-          int bowser_index = (x/11)%4;
-          //-------Función para dibujar una imagen a partir de un arreglo de colores (Bitmap) Formato (Color 16bit R 5bits G 6bits B 5bits)
-          //void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[])
-          LCD_Bitmap(x,175,32,24,tron);
-          V_line( x -1, 185, 2, 0x421b  );
-          V_line( x -2, 185, 2, 0x421b  );
-          V_line( x -3, 185, 2, 0x421b  );
-          V_line( x -4, 185, 2, 0x421b  );
-          V_line( x -5, 185, 2, 0x421b  );
-          if (digitalRead(31)==HIGH){
-            break;
-          }
-        }
-      }*/
     }
   }
-  //-------control de cual imagen se pone
-  //antirrebote1
-  /*buttonState = digitalRead(17);         //se toma la lectura del boton 2
-  if (buttonState != lastButtonState) {
-    if (buttonState == 1) {
-      wenas++;
-      Serial.println(wenas);
-    } 
-    else {
-      Serial.println("wenas");
-    }
-  }
-  delay(1);
-  lastButtonState = buttonState;
-  //-------antirrebote2
-  /*if (b2==0 && antirrebote2==0){
-    antirrebote2=1;
-  }
-  else{
-    antirrebote2=0;
-  } 
-  //-------accion luego del antirrebote1
-  if (antirrebote2==1 && b2==0){
-    wenas++;
-    Serial.println(wenas);
-  }*/
-
-
-  /*if (wenas==15){
-    LCD_Clear(0x00);
-    mapeo_SD("yourock.txt");                       //imagen alma
-    String text1 = "ganaste perro";         //pequeña descripcion
-    LCD_Print(text1, 60, 185, 2, 0x0000, 0xffff);  //caracteristicas de texto
-  }
-  
-  
-}*/
-
-
 
 /*-----------------------------------------------------------------------------
  ------------------------- F U N C I O N E S ----------------------------------
@@ -2451,4 +2515,25 @@ void defensiva(void){
     Serial.println(m1);
     Serial.println(m2);
   }
+}
+
+void beep(int note, int duration){
+  tone(PF_2, note, duration / 2);
+  delay(duration / 2);
+  noTone(PF_2);
+  delay(duration / 2 + 20);
+}
+
+void musica(void){
+  beep(NOTE_G2,200);
+  beep(NOTE_C2,400);
+  beep(NOTE_A2,400);
+  beep(NOTE_G2,200);
+  beep(NOTE_G2,200);
+  beep(0,200);
+  beep(NOTE_C2,200);
+  beep(NOTE_E3,200);
+  
+  //NOTE_G2, NOTE_C2, NOTE_A2, NOTE_G2, NOTE_G2, 0, NOTE_C2, NOTE_E3
+  //4, 8, 8, 4, 4, 4, 4, 4
 }
